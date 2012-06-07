@@ -12,17 +12,36 @@ void loop() {
   
   // potmeter doesn't make the full sweep to 1024, so we'll have 
   // to specify the max value manually
-  int sensorMaxValue = 770;
-
-  // Read the position of the other 2 pots
-  int limmin = analogRead(A1);
-  int limmax = analogRead(A2);
+  int sensorMaxValue = 800;
+  float logPotCorrectionConstant = 0.3;
   
 
-  float voltage1 = sensorValue + 2; // this needs some work :s
+  // Read the position of the other 2 pots
+  int limMin = analogRead(A3);
+  float limMinNorm = limMin / 1023.0;
+  int limMax = analogRead(A5);
+  float limMaxNorm = limMax / 1023.0;
+  
+  float limDeltaNorm = limMaxNorm - limMinNorm;
+  
+  
+  // To obtain a (sort of) linear signal from a log pot, 
+  // we need to raise the value to a certain power 0 ... 1
+  float linLevelNorm = (pow(sensorValue, logPotCorrectionConstant))/pow(sensorMaxValue, logPotCorrectionConstant) ;
+  
+ 
+  
+  float scaledLevelNorm = limMinNorm + (limDeltaNorm * linLevelNorm);
+  
+  
   // print out the value you read:
-  Serial.println(voltage1);
+  Serial.println(linLevelNorm);
   Serial.println(sensorValue);
   Serial.println("");
+  Serial.println(limMinNorm);
+  Serial.println(limMaxNorm);
+  Serial.println("");
+  Serial.println(scaledLevelNorm);
+  Serial.println("-------");
   delay(250);
 }
