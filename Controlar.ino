@@ -1,10 +1,3 @@
-/*
-  ReadAnalogVoltage
-  Reads an analog input on pin 0, converts it to voltage, and prints the result to the serial monitor.
-  Attach the center pin of a potentiometer to pin A0, and the outside pins to +5V and ground.
- 
- This example code is in the public domain.
- */
 
 // the setup routine runs once when you press reset:
 void setup() {
@@ -16,14 +9,17 @@ void setup() {
 void loop() {
   // read the input on analog pin 0:
   int sensorValue = analogRead(A0);
-  int sensorMaxValue = 770;
-  //sensorValue = 100*sensorValue/sensorMaxValue;
   
+  // potmeter doesn't make the full sweep to 1024, so we'll have 
+  // to specify the max value manually
+  int sensorMaxValue = 770;
+
+  // Read the position of the other 2 pots
   int limmin = analogRead(A1);
   int limmax = analogRead(A2);
-  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
-  //float voltage1 = sensorValue + (pow(10, 2*(sensorValue-sensorMaxValue)));
-  float voltage1 = sensorValue + 2;
+  
+
+  float voltage1 = sensorValue + 2; // this needs some work :s
   // print out the value you read:
   Serial.println(voltage1);
   Serial.println(sensorValue);
