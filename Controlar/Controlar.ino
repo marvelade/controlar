@@ -1,20 +1,55 @@
 
+// Include the Stepper Library
+#include <Stepper.h>
+
+
+// Map our pins to constants to make things easier to keep track of
+const int pwmA = 3;
+const int pwmB = 11;
+const int brakeA = 9;
+const int brakeB = 8;
+const int dirA = 12;
+const int dirB = 13;
+
+// The amount of steps for a full revolution of your motor.
+// 360 / stepAngle
+const int STEPS = 200;
+
+// Initialize the Stepper class
+Stepper myStepper(STEPS, dirA, dirB);
+
 // the setup routine runs once when you press reset:
 void setup() {
-  // initialize serial communication at 9600 bits per second:
+  // Set the RPM of the motor
+  myStepper.setSpeed(300);
+
+  // Turn on pulse width modulation
+  pinMode(pwmA, OUTPUT);
+  digitalWrite(pwmA, HIGH);
+  pinMode(pwmB, OUTPUT);
+  digitalWrite(pwmB, HIGH);
+
+  // Turn off the brakes
+  pinMode(brakeA, OUTPUT);
+  digitalWrite(brakeA, LOW);
+  pinMode(brakeB, OUTPUT);
+  digitalWrite(brakeB, LOW);
+
+  // Log some shit
   Serial.begin(9600);
 }
 
+int prev = 0;
+// potmeter doesn't make the full sweep to 1024, so we'll have 
+// to specify the max value manually
+int sensorMaxValue = 800;
+float logPotCorrectionConstant = 0.3;
+
 // the loop routine runs over and over again forever:
-void loop() {
+void loop()
+{
   // read the input on analog pin 0:
   int sensorValue = analogRead(A0);
-  
-  // potmeter doesn't make the full sweep to 1024, so we'll have 
-  // to specify the max value manually
-  int sensorMaxValue = 800;
-  float logPotCorrectionConstant = 0.3;
-  
 
   // Read the position of the other 2 pots
   int limMin = analogRead(A3);
@@ -32,6 +67,16 @@ void loop() {
  
   
   float scaledLevelNorm = limMinNorm + (limDeltaNorm * linLevelNorm);
+  int val = (200*scaledLevelNorm);
+  int diff = val - prev; 
+  
+  Serial.println("diff");
+  Serial.println(diff);
+  
+  Serial.println("----------------");
+  myStepper.step(diff);
+  prev = val;
+
   
   
   // print out the value you read:
@@ -43,5 +88,5 @@ void loop() {
   Serial.println("");
   Serial.println(scaledLevelNorm);
   Serial.println("-------");
-  delay(250);
+  delay(10);
 }
