@@ -21,7 +21,7 @@ Stepper myStepper(STEPS, dirA, dirB);
 // the setup routine runs once when you press reset:
 void setup() {
   // Set the RPM of the motor
-  myStepper.setSpeed(300);
+  myStepper.setSpeed(250);
 
   // Turn on pulse width modulation
   pinMode(pwmA, OUTPUT);
@@ -49,12 +49,12 @@ float logPotCorrectionConstant = 0.3;
 void loop()
 {
   // read the input on analog pin 0:
-  int sensorValue = analogRead(A0);
+  int sensorValue = analogRead(A2);
 
   // Read the position of the other 2 pots
-  int limMin = analogRead(A3);
+  int limMin = analogRead(A4)/5;
   float limMinNorm = limMin / 1023.0;
-  int limMax = analogRead(A5);
+  int limMax = analogRead(A5)/5;
   float limMaxNorm = limMax / 1023.0;
   
   float limDeltaNorm = limMaxNorm - limMinNorm;
@@ -67,7 +67,7 @@ void loop()
  
   
   float scaledLevelNorm = limMinNorm + (limDeltaNorm * linLevelNorm);
-  int val = (200*scaledLevelNorm);
+  int val = map(sensorValue,0,sensorMaxValue,limMin,limMax);
   int diff = val - prev; 
   
   Serial.println("diff");
@@ -80,13 +80,13 @@ void loop()
   
   
   // print out the value you read:
-  Serial.println(linLevelNorm);
+  /*Serial.println(linLevelNorm);
   Serial.println(sensorValue);
   Serial.println("");
   Serial.println(limMinNorm);
   Serial.println(limMaxNorm);
   Serial.println("");
   Serial.println(scaledLevelNorm);
-  Serial.println("-------");
-  delay(10);
+  Serial.println("-------");*/
+  delay(2);
 }
