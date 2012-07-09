@@ -42,51 +42,50 @@ void setup() {
 int prev = 0;
 // potmeter doesn't make the full sweep to 1024, so we'll have 
 // to specify the max value manually
-int sensorMaxValue = 800;
+float sensorMaxValue = 781.0;
 float logPotCorrectionConstant = 0.3;
 
 // the loop routine runs over and over again forever:
 void loop()
 {
-  // read the input on analog pin 0:
-  int sensorValue = analogRead(A2);
+  
 
-  // Read the position of the other 2 pots
-  int limMin = analogRead(A4)/5;
-  float limMinNorm = limMin / 1023.0;
-  int limMax = analogRead(A5)/5;
-  float limMaxNorm = limMax / 1023.0;
+  // Read the position of the 2 limiter pots
+  int limMin = analogRead(A4);
+  float limMinNorm = limMin/1024;
   
-  float limDeltaNorm = limMaxNorm - limMinNorm;
+  float limMax = analogRead(A5)/1024;
+  
+  // read the input on analog pin 2 and linearize:
+  float sensorValue = pow((analogRead(A2)/sensorMaxValue), logPotCorrectionConstant);
   
   
-  // To obtain a (sort of) linear signal from a log pot, 
-  // we need to raise the value to a certain power 0 ... 1
-  float linLevelNorm = (pow(sensorValue, logPotCorrectionConstant))/pow(sensorMaxValue, logPotCorrectionConstant) ;
+  // map the sensor value to the range set by the 2 limiter pots
+  float val = map(sensorValue,0,1,limMin,limMax);
+  val = val*150;
   
- 
-  
-  float scaledLevelNorm = limMinNorm + (limDeltaNorm * linLevelNorm);
-  int val = map(sensorValue,0,sensorMaxValue,limMin,limMax);
   int diff = val - prev; 
   
-  Serial.println("diff");
-  Serial.println(diff);
+   Serial.print("sensorValue: ");
+   Serial.println(sensorValue);
+   
+   Serial.print("limMinNorm: ");
+   Serial.println(limMinNorm);
+   
+   Serial.print("limMax: ");
+   Serial.println(limMax);
   
-  Serial.println("----------------");
+  
+  Serial.print("diff: ");
+  Serial.println(diff);
+
   myStepper.step(diff);
   prev = val;
 
   
   
-  // print out the value you read:
-  /*Serial.println(linLevelNorm);
-  Serial.println(sensorValue);
-  Serial.println("");
-  Serial.println(limMinNorm);
-  Serial.println(limMaxNorm);
-  Serial.println("");
-  Serial.println(scaledLevelNorm);
-  Serial.println("-------");*/
-  delay(2);
+  Serial.print("val: ");
+  Serial.println(val);
+  Serial.println("-------");
+  delay(500);
 }
