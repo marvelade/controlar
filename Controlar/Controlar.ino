@@ -21,7 +21,7 @@ Stepper myStepper(STEPS, dirA, dirB);
 // the setup routine runs once when you press reset:
 void setup() {
   // Set the RPM of the motor
-  myStepper.setSpeed(300);
+  myStepper.setSpeed(100);
 
   // Turn on pulse width modulation
   pinMode(pwmA, OUTPUT);
@@ -91,5 +91,5 @@ void loop()
   
   
   Serial.println("-------");
-  delay(1);
+  delay(10);
 }

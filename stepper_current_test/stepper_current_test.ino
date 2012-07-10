@@ -47,7 +47,7 @@ void loop()
    
    Serial.print("current: ");
    Serial.println(totalCurrent);
-   if(totalCurrent > 200.0)
+   if(totalCurrent > 600.0)
    {
      Serial.println("Current too high. Stalling.");
    }
