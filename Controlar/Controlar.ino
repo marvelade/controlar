@@ -21,7 +21,7 @@ Stepper myStepper(STEPS, dirA, dirB);
 // the setup routine runs once when you press reset:
 void setup() {
   // Set the RPM of the motor
-  myStepper.setSpeed(250);
+  myStepper.setSpeed(300);
 
   // Turn on pulse width modulation
   pinMode(pwmA, OUTPUT);
@@ -39,7 +39,7 @@ void setup() {
   Serial.begin(9600);
 }
 
-int prev = 0;
+float prev = 0.0;
 // potmeter doesn't make the full sweep to 1024, so we'll have 
 // to specify the max value manually
 float sensorMaxValue = 781.0;
@@ -51,20 +51,25 @@ void loop()
   
 
   // Read the position of the 2 limiter pots
-  int limMin = analogRead(A4);
+  float limMin = analogRead(A4);
   float limMinNorm = limMin/1024;
   
-  float limMax = analogRead(A5)/1024;
+  float limMax = analogRead(A5);
+  float limMaxNorm = limMax/1024;
+  
+  float limDeltaNorm = limMaxNorm - limMinNorm;
   
   // read the input on analog pin 2 and linearize:
   float sensorValue = pow((analogRead(A2)/sensorMaxValue), logPotCorrectionConstant);
   
   
   // map the sensor value to the range set by the 2 limiter pots
-  float val = map(sensorValue,0,1,limMin,limMax);
-  val = val*150;
+  float val = limMinNorm + (limDeltaNorm * sensorValue);
   
-  int diff = val - prev; 
+  Serial.print("val: ");
+  Serial.println(val);
+  
+  float diff = round((val - prev)*160); 
   
    Serial.print("sensorValue: ");
    Serial.println(sensorValue);
@@ -72,8 +77,8 @@ void loop()
    Serial.print("limMinNorm: ");
    Serial.println(limMinNorm);
    
-   Serial.print("limMax: ");
-   Serial.println(limMax);
+   Serial.print("limMaxNorm: ");
+   Serial.println(limMaxNorm);
   
   
   Serial.print("diff: ");
@@ -84,8 +89,7 @@ void loop()
 
   
   
-  Serial.print("val: ");
-  Serial.println(val);
+  
   Serial.println("-------");
-  delay(500);
+  delay(1);
 }
